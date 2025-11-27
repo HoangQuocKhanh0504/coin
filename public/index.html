@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Coin Dashboard Generator</title>
+<link rel="icon" href="GD.png" type="image/png">
+<style>
+/* Reset & font */
+* { box-sizing: border-box; margin:0; padding:0; }
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#0d0d0d; color:#fff; }
+
+/* Notification bar */
+#notification-bar {
+    width: 100%;
+    background-color: #ffcc00;
+    color: #000;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    height: 40px;
+    line-height: 40px;
+    border-bottom: 2px solid #cc9900;
+    box-sizing: border-box;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+}
+#scrolling-wrapper {
+    display: inline-block;
+    white-space: nowrap;
+    will-change: transform;
+    animation: scroll-infinite 30s linear infinite;
+}
+#scrolling-wrapper span { padding-right: 50px; }
+#scrolling-wrapper a { color:#000; text-decoration: underline; }
+@keyframes scroll-infinite {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    background: linear-gradient(90deg, #00ffff, #ff00ff);
+    border-radius: 10px;
+    overflow: hidden;
+    max-width: 600px;
+    margin: 20px auto 0 auto;
+    box-shadow: 0 0 20px rgba(0,255,255,0.3);
+}
+.navbar button {
+    flex: 1;
+    padding: 14px 20px;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    text-shadow: 0 0 5px #000;
+}
+.navbar button:hover, .navbar button.active {
+    background: rgba(255,255,255,0.2);
+    color: #0ff;
+}
+
+/* Tab content */
+.tab-content {
+    max-width: 600px;
+    margin: 20px auto;
+    background: #1b1b1b;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,255,255,0.3);
+    overflow: hidden;
+}
+
+/* Tab sections with fade */
+.tab-section {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    padding: 0 25px;
+    transition: opacity 0.4s ease, max-height 0.4s ease, padding 0.4s ease;
+}
+.tab-section.active {
+    opacity: 1;
+    max-height: 2000px;
+    padding: 25px;
+}
+
+/* Form styles */
+.form-group { margin-bottom: 15px; }
+label { display: block; margin-bottom:5px; color:#0ff; font-weight:bold; }
+input { width: 100%; padding:10px 12px; border-radius:8px; border:1px solid #0ff; background:#222; color:#fff; font-size:16px; transition:0.3s; }
+input:focus { border-color:#ff0; box-shadow: 0 0 10px #0ff; outline:none; }
+
+/* Buttons */
+button.action-btn {
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    font-size:18px;
+    font-weight:bold;
+    cursor:pointer;
+    margin-top:10px;
+    transition:0.3s;
+}
+button#zipBtn {
+    background: linear-gradient(90deg,#0ff,#0aa);
+    color:#000;
+    box-shadow: 0 0 10px #0ff;
+}
+button#zipBtn:hover {
+    background: linear-gradient(90deg,#0aa,#0ff);
+    box-shadow: 0 0 20px #0ff;
+}
+button#videoBtn {
+    background: linear-gradient(90deg,#ff6a00,#ff00ff);
+    color:#fff;
+    box-shadow: 0 0 10px #ff6a00;
+}
+button#videoBtn:hover {
+    background: linear-gradient(90deg,#ff00ff,#ff6a00);
+    box-shadow: 0 0 20px #ff6a00;
+}
+
+/* Footer */
+.footer { text-align:center; font-size:13px; color:#888; margin-top:20px; }
+
+/* Video popup overlay */
+#videoPopup {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    position:fixed;
+    top:0; left:0; right:0; bottom:0;
+    background: rgba(0,0,0,0.95);
+    z-index: 10001; /* cao hơn notification bar */
+    opacity:0;
+    pointer-events:none;
+    transition:0.3s;
+}
+#videoPopup.show {
+    opacity:1;
+    pointer-events:auto;
+}
+#videoPopup video {
+    width: 80%;
+    max-width: 800px;
+    border-radius:10px;
+    box-shadow:0 0 20px #0ff;
+}
+#videoPopup .close {
+    position:absolute;
+    top:15px; right:25px;
+    font-size:30px; font-weight:bold;
+    color:#fff;
+    cursor:pointer;
+    text-shadow: 0 0 5px #000;
+    z-index: 10002;
+}
+
+/* Tab sections content */
+.tab-section h2 { margin-bottom:15px; color:#0ff; text-shadow:0 0 5px #0ff; }
+.tab-section p { margin-bottom:10px; line-height:1.5; }
+.tab-section a { color:#0ff; text-decoration:none; }
+.tab-section a:hover { text-decoration:underline; }
+</style>
+</head>
+<body>
+
+<!-- Notification Bar -->
+<div id="notification-bar">
+  <div id="scrolling-wrapper">
+    <span>
+      Hiện tại web chỉ mới đang phát triển nên sẽ có 1 số lỗi không mong muốn. Đôi khi css của web sẽ bị mất. Nếu các bạn muốn làm web thì có thể liên hệ mình qua website: 
+      <a href="https://aikhanh.onrender.com" target="_blank">https://aikhanh.onrender.com</a>
+      © KHANHPC 2025 | mọi quyền được bảo lưu
+    </span>
+    <span>
+      Hiện tại web chỉ mới đang phát triển nên sẽ có 1 số lỗi không mong muốn. Đôi khi css của web sẽ bị mất. Nếu các bạn muốn làm web thì có thể liên hệ mình qua website: 
+      <a href="https://aikhanh.onrender.com" target="_blank">https://aikhanh.onrender.com</a>
+      © KHANHPC 2025 | mọi quyền được bảo lưu
+    </span>
+  </div>
+</div>
+
+<!-- Navbar -->
+<div class="navbar">
+    <button class="tab-btn active" data-tab="zip">Tạo ZIP Coin</button>
+    <button class="tab-btn" data-tab="about">Giới thiệu</button>
+    <button class="tab-btn" data-tab="contact">Liên hệ</button>
+</div>
+
+<!-- Tab Contents -->
+<div class="tab-content">
+    <!-- ZIP Coin -->
+    <div class="tab-section" id="zip">
+        <h2>Tạo ZIP Coin</h2>
+        <div class="form-group">
+            <label for="coin">Tên coin</label>
+            <input id="coin" placeholder="VD: BTC, SOL" autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label for="wallet">Địa chỉ ví</label>
+            <input id="wallet" placeholder="Nhập địa chỉ ví" autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label for="worker">Tên máy đào</label>
+            <input id="worker" placeholder="VD: Worker01" autocomplete="off">
+        </div>
+        <button id="zipBtn" class="action-btn" onclick="submitForm()">Xuất ZIP</button>
+    </div>
+
+    <!-- Giới thiệu -->
+    <div class="tab-section" id="about">
+        <h2>Giới thiệu</h2>
+        <p>Chào mừng đến với <strong>Coin ZIP Generator</strong> – công cụ giúp bạn nhanh chóng tạo file ZIP chứa cấu hình mining coin, bao gồm <code>coin.cmd</code>, <code>config.json</code> và <code>xmrig.exe</code>.</p>
+        <p>Bạn có thể xem hướng dẫn sử dụng video trực tiếp bằng cách nhấn nút bên dưới:</p>
+        <button id="videoBtn" class="action-btn" onclick="openVideo()">Xem Hướng Dẫn</button>
+    </div>
+
+    <!-- Liên hệ -->
+    <div class="tab-section" id="contact">
+        <h2>Liên hệ</h2>
+        <p>Facebook: <a href="https://fb.com/khanhdev548" target="_blank">fb.com/khanhdev548</a></p>
+        <p>Email: <a href="mailto:vyk103736@domain.com">vyk103736@domain.com</a></p>
+        <p>© 2025 Khánh Dev. All rights reserved.</p>
+    </div>
+</div>
+
+<!-- Video Popup -->
+<div id="videoPopup">
+    <span class="close" onclick="closeVideo()">×</span>
+    <video id="videoFrame" controls autoplay>
+        <source src="" type="video/mp4">
+        Trình duyệt của bạn không hỗ trợ video.
+    </video>
+</div>
+
+<script>
+// Đẩy nội dung xuống dựa vào height notification bar
+const notif = document.getElementById('notification-bar');
+document.body.style.marginTop = notif.offsetHeight + 'px';
+
+// Tab switching với fade-in/out
+const tabs = document.querySelectorAll('.tab-btn');
+const sections = document.querySelectorAll('.tab-section');
+tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const target = tab.getAttribute('data-tab');
+        sections.forEach(sec => sec.id === target ? sec.classList.add('active') : sec.classList.remove('active'));
+    });
+});
+sections.forEach((sec, idx) => { if(idx===0) sec.classList.add('active'); });
+
+// ZIP Generation
+async function submitForm() {
+    const coin = document.getElementById("coin").value.trim();
+    const wallet = document.getElementById("wallet").value.trim();
+    const worker = document.getElementById("worker").value.trim();
+    if (!coin || !wallet || !worker) return alert("Điền đủ 3 ô!");
+    try {
+        const res = await fetch("/generate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ coin, wallet, worker })
+        });
+        if (!res.ok) throw new Error("Lỗi server!");
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "coin_pack.zip";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } catch(err) { alert("Có lỗi: " + err.message); }
+}
+
+// Video popup
+function openVideo() {
+    const popup = document.getElementById("videoPopup");
+    const video = document.getElementById("videoFrame");
+    video.src = "1127.mp4"; // đường dẫn video
+    video.play();
+    popup.classList.add('show');
+}
+function closeVideo() {
+    const popup = document.getElementById("videoPopup");
+    const video = document.getElementById("videoFrame");
+    video.pause();
+    video.currentTime = 0;
+    video.src = "";
+    popup.classList.remove('show');
+}
+</script>
+
+</body>
+</html>
